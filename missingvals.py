@@ -20,7 +20,7 @@ def Impute():
     
     #tested axes- we want axis 0 to impute down a column
     #Using mode because of sparsity- if 99% of values are 0, most likely that this will be a 0 too.
-    imp = Imputer(missing_values='NaN', strategy='median', axis=0)
+    imp = Imputer(missing_values=np.nan, strategy='mean', axis=0)
     X= imp.fit_transform(info)
     
     #using a sparse data scaler due to the number of zeros from binarized variables
@@ -31,8 +31,8 @@ def Impute():
     X= ss.fit_transform(X)
     X= mms.fit_transform(X)
     
-    labels=pd.read_csv('/media/james/ext4data1/current/projects/pfizer/labels-final.csv', encoding='utf-8').set_index('PATIENT')
-    labels= labels.join(info, how='inner')
+    labels=pd.read_csv('/media/james/ext4data1/current/projects/pfizer/combined-study/class-labels.csv', encoding='utf-8').set_index('PATIENT')
+
     labels= pd.DataFrame(index=labels.index, data=labels['GROUPLABEL'], columns=['GROUPLABEL'])
     labels.to_csv(path_or_buf='/media/james/ext4data1/current/projects/pfizer/labels-final.csv', index_label='PATIENT')
     
@@ -40,6 +40,6 @@ def Impute():
     #str((np.count_nonzero(X)/(X.shape[0]*X.shape[1]))*100) to get density... 96% sparse 
     #Should return to the psych scales (madrs, hamd etc) and encode using OneHotEncoder, since continuous variables are expected.
     
-    np.savetxt('/media/james/ext4data1/current/projects/pfizer/data.csv', X, delimiter=',')
+    np.savetxt('/media/james/ext4data1/current/projects/pfizer/combined-study/data.csv', X, delimiter=',')
     
     return

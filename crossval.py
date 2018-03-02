@@ -7,8 +7,8 @@ from sklearn.model_selection import StratifiedKFold
 
 def OuterCv():   
     
-    data=np.loadtxt('/media/james/ext4data1/current/projects/pfizer/data.csv', delimiter=',')
-    labels=np.array(pd.read_csv('/media/james/ext4data1/current/projects/pfizer/labels-final.csv', encoding='utf-8')['GROUPLABEL'])
+    data=np.loadtxt('/media/james/ext4data1/current/projects/pfizer/combined-study/data.csv', delimiter=',')
+    labels=np.loadtxt('/media/james/ext4data1/current/projects/pfizer/combined-study/labels.csv', delimiter=',')
         
     #Treatment Response: 379 subjects, 200 remitters (52.77%), 179 with HAM-D > 7\n')
     
@@ -33,13 +33,13 @@ def OuterCv():
         outer_cv['train_indices'].append(train_index)
         outer_cv['test_indices'].append(test_index)
     
-    with open('/media/james/ext4data1/current/projects/pfizer/ocv.pickle', 'wb') as f: pickle.dump(outer_cv, f, pickle.HIGHEST_PROTOCOL) 
+    with open('/media/james/ext4data1/current/projects/pfizer/combined-study/ocv.pickle', 'wb') as f: pickle.dump(outer_cv, f, pickle.HIGHEST_PROTOCOL) 
 
     return
     
 def InnerCv():
     '''Set up as a flat structure of 25 df'''
-    with open('/media/james/ext4data1/current/projects/pfizer/ocv.pickle', 'rb') as f: outer_cv= pickle.load(f)
+    with open('/media/james/ext4data1/current/projects/pfizer/combined-study/ocv.pickle', 'rb') as f: outer_cv= pickle.load(f)
 
     inner_cv= {'X_train': [], 'X_test': [], 
                'y_train': [], 'y_test': [],
@@ -66,7 +66,7 @@ def InnerCv():
             inner_cv['train_indices'].append(train_index)
             inner_cv['test_indices'].append(test_index)
 
-    with open('/media/james/ext4data1/current/projects/pfizer/icv.pickle', 'wb') as f: pickle.dump(inner_cv, f, pickle.HIGHEST_PROTOCOL) 
+    with open('/media/james/ext4data1/current/projects/pfizer/combined-study/icv.pickle', 'wb') as f: pickle.dump(inner_cv, f, pickle.HIGHEST_PROTOCOL) 
     
     return
 

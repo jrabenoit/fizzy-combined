@@ -13,10 +13,13 @@ def Misc():
 
     #drops duplicates if both column 1 AND column 2 have the same row value
     lab=lab.drop_duplicates(subset=['PATIENT', 'LPARM'], keep='first')
+    
     #Encodes variables
     lab1['ETHNIC']=pd.Categorical(lab1['ETHNIC']).codes
+    
     #pivot each column of lab to its own table (lab1, lab2, etc)
     lab1= lab.pivot(index='PATIENT',columns='LPARM',values='LVALN')
+    
     #relabels columns so join works
     lab1.columns='lab1-'+lab1.columns
     
@@ -24,25 +27,67 @@ def Misc():
 
     labs=lab1.join([lab2, lab3])
 
+    #Descriptive statistics: central tendency, dispersion and shape
+    dfs2b['HAMD Total'].describe()
+
+    #Returns vals in df1 that are also in df2
+    np.intersect1d(df1['PATIENT'],df2['PATIENT'])
+
+    #Returns vals in df1 that are not in df2
+    np.setdiff1d(df1['PATIENT'],df2['PATIENT'])
+    
+    #Quick way to encode/binarize
+    df.set_index('PATIENT')
+    df['ones']=1
+    df.pivot(columns='MEDGNX', values='ones')
+    df=df.fillna(value=0)
+
+    #Recode a variable
+    df['Severity of illness']=df['Severity of illness'].replace(to_replace='Borderline ill', value='Borderline mentally ill')
+
+    #Cgi ordered categories, -1 indicates NaN
+    df=df.set_index('patient')
+    cat=['Normal, not at all ill',
+    'Borderline mentally ill',
+    'Mildly ill',  
+    'Moderately ill',
+    'Markedly ill',
+    'Severely ill',
+    'Among the most extremely ill']
+    df['CGI SEVERITY']=pd.Categorical(df['Severity of illness'], categories=cat).codes       
+    
+    df[df['CGI SEVERITY']==-1]
+    >>>output: 89CHQS
+    df=df.drop(['89CHQS'])
+    
+    #demow ordered sex/race
+    cat=['Male', 'Female']
+    
+    #split off a variable
+    dftherdur=df['THERDUR'].to_frame()
+    del df['THERDUR']
+    
+    #ethnicity ordering- alphabetical like NIH
+    eth=['American Indian or Alaska Native',
+     'Asian',  
+     'Black or African American',
+     'Hispanic or Latino',
+     'Native Hawaiian or Other Pacific Islander',
+     'Other',
+     'White']
+
+    #sex ordering- alphabetical
+    sex=['Female','Male']
+    
     return
 
 
 def Labeler():
     hamd=pd.read_csv('/media/james/ext4data1/current/projects/pfizer/303-data/deid_hamd17a.csv')
-    d60=hamd[hamd['CPENM']=='DAY 60']
-    d60p= d60.pivot(index='PATIENT',columns='TESTS',values='VALN')
-       
-    mddict={}
-    for i in d60p.index:        
-        if d60p.loc[i,'Total Score (HAM-D17)']<=7: remit=1
-        else: remit=0
-        mddict[i]=remit
-        
-    labels=pd.DataFrame.from_dict(mddict, orient='index')
-    labels.columns= ['GROUPLABEL']
-    labels=labels.sort_index()
+    df['HAMD 1=REMIT']=np.where(df['HAMD-17 questions Total score derived']<=7, 1, 0)
+
             
-    labels.to_csv(path_or_buf='/media/james/ext4data1/current/projects/pfizer/labels-d60-remitters.csv', index_label='PATIENT')
+    df.to_csv(path_or_buf='/media/james/ext4data1/current/projects/pfizer/combined-study/class-labels.csv', index_label='PATIENT')
         
     return
 
@@ -122,14 +167,4 @@ def Harvester():
     
     return
 
-    
-'''
-#Descriptive statistics: central tendency, dispersion and shape
-dfs2b['HAMD Total'].describe()
-
-#Returns vals in df1 that are also in df2
-np.intersect1d(df1['PATIENT'],df2['PATIENT'])
-
-#Returns vals in df1 that are not in df2
-np.setdiff1d(df1['PATIENT'],df2['PATIENT'])
-'''
+   
