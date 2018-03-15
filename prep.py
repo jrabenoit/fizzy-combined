@@ -45,6 +45,14 @@ def Misc():
     #Recode a variable
     df['Severity of illness']=df['Severity of illness'].replace(to_replace='Borderline ill', value='Borderline mentally ill')
 
+    #Quick way to sample a class to even out classes
+    df['HAMD 1=REMIT'].value_counts()
+    df0=df.loc[df['HAMD 1=REMIT']==0]
+    df1=df.loc[df['HAMD 1=REMIT']==1]
+    dfs=df0.sample(n=1620) 
+    dflist=[df1, dfs] 
+    dfc=pd.concat(dflist)
+
     #Cgi ordered categories, -1 indicates NaN
     df=df.set_index('patient')
     cat=['Normal, not at all ill',

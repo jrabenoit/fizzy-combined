@@ -10,34 +10,34 @@ from sklearn import svm, naive_bayes, neighbors, ensemble, linear_model, tree, n
 
 def InnerFolds():
     with open('/media/james/ext4data1/current/projects/pfizer/combined-study/icvfeats.pickle','rb') as f: icv=pickle.load(f)
-    patients= pd.read_csv('/media/james/ext4data1/current/projects/pfizer/combined-study/class-labels.csv', encoding='utf-8').set_index('PATIENT')
+    patients= pd.read_csv('/media/james/ext4data1/current/projects/pfizer/combined-study/labels.csv', encoding='utf-8').set_index('PATIENT')
     
     folds= len(icv['X_train'])   
     
-    rf= ensemble.RandomForestClassifier()
-    et= ensemble.ExtraTreesClassifier()
-    kn= neighbors.KNeighborsClassifier()
+    rf= ensemble.RandomForestClassifier(max_features=20, max_depth=5, n_jobs=3, bootstrap=False)
+    et= ensemble.ExtraTreesClassifier(max_features=20, max_depth=5, n_jobs=3, bootstrap=False)
+    kn= neighbors.KNeighborsClassifier(n_neighbors=30, n_jobs=3, p=1)
     nb= naive_bayes.GaussianNB()
     nn= neural_network.MLPClassifier()
-    dt= tree.DecisionTreeClassifier()
-    ls= svm.LinearSVC()
-    gb= ensemble.GradientBoostingClassifier()
+    dt= tree.DecisionTreeClassifier(max_features=20, max_depth=5, criterion='entropy')
+    ls= svm.LinearSVC(penalty='l1', dual=False)
+    gb= ensemble.GradientBoostingClassifier(loss='exponential', max_depth=2)
     
-    ab= ensemble.AdaBoostClassifier(base_estimator= rf, learning_rate=0.9)
-    vc= ensemble.VotingClassifier(estimators=[('rf', rf),('kn', kn),('et',et)])
-    bc= ensemble.BaggingClassifier(base_estimator=rf, n_estimators=10)
+    ab= ensemble.AdaBoostClassifier(base_estimator=rf)
+    vc= ensemble.VotingClassifier(estimators=[('rf', rf),('kn', kn),('et',et)], voting='soft')
+    bc= ensemble.BaggingClassifier(base_estimator=rf, n_jobs=3)
     
-    est= {'randomforest': rf,
-          'extratrees': et,
-          'kneighbors': kn,
-          'naivebayes': nb,
-          'decisiontree': dt,
-          'linearsvc': ls,
+    est= {#'randomforest': rf,
+          #'extratrees': et,
+          #'kneighbors': kn,
+          #'naivebayes': nb,
+          #'decisiontree': dt,
+          #'linearsvc': ls,
           'adaboost': ab,
-          'neuralnet': nn,
-          'voting': vc,
-          'hobbitses': bc,
-          'gboost': gb
+          #'neuralnet': nn,
+          #'voting': vc,
+          #'hobbitses': bc,
+          #'gboost': gb
           }
    
     train_results= {'fold':[], 'estimator':[], 'subjects':[], 
@@ -104,22 +104,22 @@ def InnerFolds():
 
 def OuterFolds():
     with open('/media/james/ext4data1/current/projects/pfizer/combined-study/ocvfeats.pickle','rb') as f: ocv=pickle.load(f)
-    patients= pd.read_csv('/media/james/ext4data1/current/projects/pfizer/combined-study/class-labels.csv', encoding='utf-8').set_index('PATIENT')
+    patients= pd.read_csv('/media/james/ext4data1/current/projects/pfizer/combined-study/labels.csv', encoding='utf-8').set_index('PATIENT')
     
     folds= len(ocv['X_train'])
 
-    rf= ensemble.RandomForestClassifier()
-    et= ensemble.ExtraTreesClassifier()
-    kn= neighbors.KNeighborsClassifier()
-    nb= naive_bayes.GaussianNB()
-    nn= neural_network.MLPClassifier()
-    dt= tree.DecisionTreeClassifier()
-    ls= svm.LinearSVC()
-    gb= ensemble.GradientBoostingClassifier()
+    rf= ensemble.RandomForestClassifier(n_jobs=3)
+    et= ensemble.ExtraTreesClassifier(n_jobs=3)
+    kn= neighbors.KNeighborsClassifier(n_jobs=3)
+    nb= naive_bayes.GaussianNB(n_jobs=3)
+    nn= neural_network.MLPClassifier(n_jobs=3)
+    dt= tree.DecisionTreeClassifier(n_jobs=3)
+    ls= svm.LinearSVC(n_jobs=3)
+    gb= ensemble.GradientBoostingClassifier(n_jobs=3)
     
-    ab= ensemble.AdaBoostClassifier()
-    vc= ensemble.VotingClassifier(estimators=[('rf', rf),('kn', kn),('et',et)])
-    bc= ensemble.BaggingClassifier(base_estimator=rf, n_estimators=100)
+    ab= ensemble.AdaBoostClassifier(n_jobs=3)
+    vc= ensemble.VotingClassifier(estimators=[('rf', rf),('kn', kn),('et',et)], voting='soft')
+    bc= ensemble.BaggingClassifier(base_estimator=rf, n_jobs=3)
     
     est= {#'randomforest': rf,
           #'extratrees': et,
@@ -129,8 +129,8 @@ def OuterFolds():
           #'linearsvm': ls,
           #'adaboost': ab
           #'neuralnet': nn,
-          'voting': vc
-          #'hobbitses': bc
+          #'voting': vc
+          'hobbitses': bc
           #'gboost': gb
           }
    

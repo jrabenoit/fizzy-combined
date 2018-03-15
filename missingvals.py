@@ -7,34 +7,36 @@ from sklearn.preprocessing import Imputer
 from sklearn.preprocessing import MaxAbsScaler
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import RobustScaler
 
 #http://scikit-learn.org/stable/modules/preprocessing.html#imputation-of-missing-values
 
 def Impute():
     #For sparse: Impute missing vals by most_frequent, scales as sparse matrix
     #For denser: Impute by median, scale by standard scaler
-    info=pd.read_csv('/media/james/ext4data1/current/projects/pfizer/joined-vecs.csv', encoding='utf-8').set_index('PATIENT')
+    info=pd.read_csv('/media/james/ext4data1/current/projects/pfizer/combined-study/input_data_after_dropna.csv', encoding='utf-8').set_index('PATIENT')
     
     #first, remove columns with NaN values
     info= info.dropna(axis='columns')
     
     #tested axes- we want axis 0 to impute down a column
     #Using mode because of sparsity- if 99% of values are 0, most likely that this will be a 0 too.
-    imp = Imputer(missing_values=np.nan, strategy='mean', axis=0)
+    imp = Imputer() #defaults are fine
     X= imp.fit_transform(info)
     
     #using a sparse data scaler due to the number of zeros from binarized variables
     ss= StandardScaler()
     mas= MaxAbsScaler()
     mms= MinMaxScaler() #Gets features to a 0-1 range
+    rs=RobustScaler() #Less sensitive to outliers
     
     X= ss.fit_transform(X)
-    X= mms.fit_transform(X)
+    #X= mms.fit_transform(X)
     
-    labels=pd.read_csv('/media/james/ext4data1/current/projects/pfizer/combined-study/class-labels.csv', encoding='utf-8').set_index('PATIENT')
+    labels=pd.read_csv('/media/james/ext4data1/current/projects/pfizer/combined-study/labels_after_dropna.csv', encoding='utf-8').set_index('PATIENT')
 
     labels= pd.DataFrame(index=labels.index, data=labels['GROUPLABEL'], columns=['GROUPLABEL'])
-    labels.to_csv(path_or_buf='/media/james/ext4data1/current/projects/pfizer/labels-final.csv', index_label='PATIENT')
+    labels.to_csv(path_or_buf='/media/james/ext4data1/current/projects/pfizer/combined-study/class-labels.csv', index_label='PATIENT')
     
     
     #str((np.count_nonzero(X)/(X.shape[0]*X.shape[1]))*100) to get density... 96% sparse 
