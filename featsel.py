@@ -4,7 +4,7 @@ from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import SelectFromModel
 from sklearn.feature_selection import RFECV
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LassoCV
+from sklearn.linear_model import LassoLarsIC
 import copy, pickle
 import numpy as np
 
@@ -23,9 +23,9 @@ def InnerFeats():
     feats=[[0]]*folds
     
     skb= SelectKBest(k='all')
-    #sfm=SelectFromModel(LassoCV())
     #doing second cut using rfecv to get correct # within skb
-    rfe= RFECV(RandomForestClassifier(), step=1, n_jobs=3)
+    #rfe= RFECV(RandomForestClassifier(), step=1, n_jobs=3)
+    #llic= SelectFromModel(LassoLarsIC(criterion='bic'))
     
     #LOOK HERE
     #COUPLE MORE THINGS TO TRY
@@ -37,10 +37,16 @@ def InnerFeats():
         X_train_skb= skb.transform(X_train[i])
         X_test_skb= skb.transform(X_test[i])
 
+        #RFECV option
         #rfe.fit(X_train_skb, y_train[i])
         #feats[i]=rfe.get_support(indices=True)
         #X_train_feats= rfe.transform(X_train_skb)
         #X_test_feats= rfe.transform(X_test_skb)
+
+        #LassoLarsIC option
+        #llic.fit(X_train_skb, y_train[i])
+        #X_train_feats= llic.transform(X_train_skb)
+        #X_test_feats= llic.transform(X_test_skb)
         
         X_train[i]= np.array(X_train_skb)
         X_test[i]= np.array(X_test_skb)

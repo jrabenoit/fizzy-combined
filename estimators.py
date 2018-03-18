@@ -21,23 +21,23 @@ def InnerFolds():
     dt= tree.DecisionTreeClassifier(max_features=20, max_depth=5, criterion='entropy')
     ls= svm.LinearSVC(penalty='l1', dual=False)
     gb= ensemble.GradientBoostingClassifier(loss='exponential', max_depth=2)
-    nn= neural_network.MLPClassifier(learning_rate_init=0.0001, max_iter=500)
+    nn= neural_network.MLPClassifier(hidden_layer_sizes=(40,40,40), learning_rate_init=0.0001, max_iter=500)
     
     ab= ensemble.AdaBoostClassifier()
-    vc= ensemble.VotingClassifier(estimators=[('rf', rf),('gb', gb),('et',et)], voting='soft', n_jobs=3)
     bc= ensemble.BaggingClassifier(base_estimator=rf, n_jobs=3)
+    vc= ensemble.VotingClassifier(estimators=[('rf', rf),('gb', gb),('et',et)], voting='soft')
     
-    est= {'randomforest': rf,
-          'extratrees': et,
-          'kneighbors': kn,
-          'naivebayes': nb,
-          'decisiontree': dt,
-          'linearsvc': ls,
-          'gboost': gb,
+    est= {#'randomforest': rf,
+          #'extratrees': et,
+          #'kneighbors': kn,
+          #'naivebayes': nb,
+          #'decisiontree': dt,
+          #'linearsvc': ls,
+          #'gboost': gb,
           'neuralnet': nn,
-          'adaboost': ab,
-          'voting': vc,
-          'hobbitses': bc,
+          #'adaboost': ab,
+          #'voting': vc,
+          #'bagging': bc,
           }
    
     train_results= {'fold':[], 'estimator':[], 'subjects':[], 
@@ -118,7 +118,7 @@ def OuterFolds():
     nn= neural_network.MLPClassifier(learning_rate_init=0.0001, max_iter=500)
     
     ab= ensemble.AdaBoostClassifier()
-    vc= ensemble.VotingClassifier(estimators=[('rf', rf),('gb', gb),('et',et)], voting='soft', n_jobs=3)
+    vc= ensemble.VotingClassifier(estimators=[('rf', rf),('gb', gb),('et', et)], voting='soft', n_jobs=3)
     bc= ensemble.BaggingClassifier(base_estimator=rf, n_jobs=3)
     
     est= {#'randomforest': rf,
@@ -130,7 +130,7 @@ def OuterFolds():
           #'adaboost': ab
           #'neuralnet': nn,
           #'voting': vc
-          'hobbitses': bc
+          'bagging': bc
           #'gboost': gb
           }
    

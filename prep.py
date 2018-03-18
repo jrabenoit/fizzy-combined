@@ -28,12 +28,12 @@ def Misc():
     labs=lab1.join([lab2, lab3])
 
     #Descriptive statistics: central tendency, dispersion and shape
-    dfs2b['HAMD Total'].describe()
+    df['HAMD Total'].describe()
 
     #Returns vals in df1 that are also in df2
     np.intersect1d(df1['PATIENT'],df2['PATIENT'])
 
-    #Returns vals in df1 that are not in df2
+    #Returns vals in df1 that are NOT in df2
     np.setdiff1d(df1['PATIENT'],df2['PATIENT'])
     
     #Quick way to encode/binarize
